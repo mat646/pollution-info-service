@@ -1,0 +1,6 @@
+DELETE http://localhost:3000/api/item/0
+Accept:*/*
+Cache-Control:no-cache
+
+###
+
