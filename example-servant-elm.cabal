@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1ad3309cc41055c81ccb4f2ce09f92329551ad94ce0888d36cde5cd31d502ea5
+-- hash: cd7c7c884210993cf7b8d98bbac6b6671ff1cdf63e9fc436c1ff6bb7ce938625
 
 name:           example-servant-elm
 version:        0.0.0
@@ -17,6 +17,7 @@ executable server
       aeson
     , base
     , containers
+    , http-client
     , servant
     , servant-elm
     , servant-server

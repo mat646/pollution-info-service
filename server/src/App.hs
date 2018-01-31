@@ -1,4 +1,5 @@
 {-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module App where
 
@@ -6,9 +7,11 @@ import           Control.Concurrent
 import           Control.Monad.IO.Class
 import           Control.Monad.Trans.Except
 import           Data.Map
+import           Data.Aeson
 import           Network.Wai
 import           Network.Wai.MakeAssets
 import           Servant
+import           Network.HTTP.Client (responseBody, newManager, defaultManagerSettings, parseRequest, httpLbs)
 
 import           Api
 
@@ -23,6 +26,18 @@ app =
 
 server :: IO (Server WithAssets)
 server = do
+
+-- (SENDING MOCK REQUEST AND PRINTING) start
+
+  manager <- newManager defaultManagerSettings
+
+  request <- parseRequest "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
+  response <- httpLbs request manager
+  let result = responseBody response
+  print $ result
+
+-- (SENDING MOCK REQUEST AND PRINTING) end
+
   assets <- serveAssets
   db <- mkDB
   return $ apiServer db :<|> assets
