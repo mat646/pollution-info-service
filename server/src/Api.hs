@@ -10,10 +10,13 @@ import           Data.Proxy
 import           GHC.Generics
 import           Servant.API
 import           Servant.Elm      (ElmType)
+import           Station
 
 type Api =
   "api" :>
-    ("item" :> Get '[JSON] [ItemId] :<|>
+    ("tab1" :> Get '[JSON] Station :<|>
+     "tab2" :> Get '[JSON] Station :<|>
+     "item" :> Get '[JSON] [ItemId] :<|>
      "item" :> Capture "itemId" ItemId :> Get '[JSON] Item :<|>
      "item" :> ReqBody '[JSON] String :> Post '[JSON] ItemId :<|>
      "item" :> Capture "itemId" ItemId :> Delete '[JSON] NoContent)

@@ -26,6 +26,8 @@ type alias Model =
     { items : Dict Int Item
     , addItemInput : String
     , error : Maybe String
+    , station : Cmd Msg
+    , result : Maybe Index
     }
 
 
@@ -39,8 +41,11 @@ init =
         fetch =
             Http.send (fromServer Initial) Api.getApiItem
 
+        getStation =
+            Http.send (fromServer NewStation) Api.getApiTabl
+
         state =
-            { items = empty, addItemInput = "", error = Nothing }
+            { items = empty, addItemInput = "", error = Nothing, station = getStation, result = Nothing }
     in
         ( state, fetch )
 
@@ -59,12 +64,14 @@ type FromServer
     = Initial (List ItemId)
     | NewItem Item
     | Delete ItemId
+    | NewStation Station
 
 
 type FromUi
     = AddItemInputChange String
     | AddItemButton
     | Done ItemId
+    | ShowStation1
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -86,15 +93,26 @@ update message s =
                 Delete id ->
                     { s | items = remove id s.items } ! []
 
+                NewStation station ->
+                    { s | result = Just (station.no2IndexLevel) } ! []
+
         FromUi fromUi ->
             case fromUi of
+                ShowStation1 ->
+                    let
+                        cmd =
+                            Http.send (fromServer NewStation) Api.getApiTabl
+                    in
+                        ( s , cmd)
+
                 AddItemButton ->
                     let
                         new =
                             s.addItemInput
 
                         cmd =
-                            Http.send (fromServer (\id -> NewItem (Item id new))) (postApiItem new)
+                            --Http.send (fromServer (\id -> NewItem (Item id new))) (postApiItem new)
+                            Http.send (fromServer NewStation) Api.getApiTabl
 
                         newState =
                             { s | addItemInput = "" }
@@ -141,9 +159,9 @@ view state =
             ++ [ table []
                     [ thead []
                           [ tr []
-                              [ th [ ] [ text "City" ]
+                              [ th [ ] [ text "xd" ]
                               , th [ ] [ text "Rank" ]
-                              , th [ ] [ text "Pollution index" ]
+                              , th [ ] [ text "Pollution" ]
                               ]
                           ]
                       , tbody []
@@ -160,6 +178,13 @@ view state =
                                ]
                           ]
                       ]
+               ]
+            ++ [ button [ onClick (FromUi ShowStation1)] [ text "Station 1"]
+               , button [ onClick (FromUi ShowStation1)] [ text "Station 2"]
+               , button [ onClick (FromUi ShowStation1)] [ text "Station 3"]
+               ]
+            ++ [ text (toString (state))
+               , br [] []
                ]
 
 
