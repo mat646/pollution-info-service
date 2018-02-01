@@ -26,8 +26,7 @@ type alias Model =
     { items : Dict Int Item
     , addItemInput : String
     , error : Maybe String
-    , station : Cmd Msg
-    , result : Maybe Index
+    , result : Maybe Station
     }
 
 
@@ -41,11 +40,8 @@ init =
         fetch =
             Http.send (fromServer Initial) Api.getApiItem
 
-        getStation =
-            Http.send (fromServer NewStation) Api.getApiTabl
-
         state =
-            { items = empty, addItemInput = "", error = Nothing, station = getStation, result = Nothing }
+            { items = empty, addItemInput = "", error = Nothing, result = Nothing }
     in
         ( state, fetch )
 
@@ -72,6 +68,7 @@ type FromUi
     | AddItemButton
     | Done ItemId
     | ShowStation1
+    | ShowStation2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,16 +91,23 @@ update message s =
                     { s | items = remove id s.items } ! []
 
                 NewStation station ->
-                    { s | result = Just (station.no2IndexLevel) } ! []
+                    { s | result = Just (station) } ! []
 
         FromUi fromUi ->
             case fromUi of
                 ShowStation1 ->
                     let
                         cmd =
-                            Http.send (fromServer NewStation) Api.getApiTabl
+                            Http.send (fromServer NewStation) Api.getApiTab1
                     in
-                        ( s , cmd)
+                        ( s, cmd )
+
+                ShowStation2 ->
+                    let
+                        cmd =
+                            Http.send (fromServer NewStation) Api.getApiTab2
+                    in
+                        ( s, cmd )
 
                 AddItemButton ->
                     let
@@ -111,8 +115,7 @@ update message s =
                             s.addItemInput
 
                         cmd =
-                            --Http.send (fromServer (\id -> NewItem (Item id new))) (postApiItem new)
-                            Http.send (fromServer NewStation) Api.getApiTabl
+                            Http.send (fromServer (\id -> NewItem (Item id new))) (postApiItem new)
 
                         newState =
                             { s | addItemInput = "" }
@@ -150,43 +153,52 @@ view : Model -> Html Msg
 view state =
     div [] <|
         [ text (toString state)
-        , br [] []
+        , div [] []
+        ,  button [ onClick (FromUi ShowStation1)] [ text "Station 1"]
+        , button [ onClick (FromUi ShowStation2)] [ text "Station 2"]
+        , button [ onClick (FromUi ShowStation1)] [ text "Station 3"]
         ]
-            ++ List.map (viewItem << Tuple.second) (toList state.items)
-            ++ [ input [ onInput (FromUi << AddItemInputChange) ] []
-               , button [ onClick (FromUi AddItemButton) ] [ text "add item" ]
-               ]
             ++ [ table []
                     [ thead []
                           [ tr []
-                              [ th [ ] [ text "xd" ]
-                              , th [ ] [ text "Rank" ]
+                              [ th [ ] [ text "Symbol" ]
+                              , th [ ] [ text "Time" ]
                               , th [ ] [ text "Pollution" ]
                               ]
                           ]
                       , tbody []
                           [ tr []
-                              [ td [] [ text "Krakow" ]
-                              , td [ ] [ text "1" ]
-                              , td [ ] [ text "156,34 mg" ]
+                              [ td [] [ text "NO2" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funNo2 state.result)) ]
                               ]
                               ,
                               tr []
-                               [ td [] [ text "Tarnow" ]
-                               , td [ ] [ text "2" ]
-                               , td [ ] [ text "109,84 mg" ]
+                               [ td [] [ text "SO2" ]
+                               , td [ ] [ text (toString (fun state.result)) ]
+                               , td [ ] [ text (toString (funSo4 state.result)) ]
                                ]
                           ]
                       ]
                ]
-            ++ [ button [ onClick (FromUi ShowStation1)] [ text "Station 1"]
-               , button [ onClick (FromUi ShowStation1)] [ text "Station 2"]
-               , button [ onClick (FromUi ShowStation1)] [ text "Station 3"]
-               ]
-            ++ [ text (toString (state))
-               , br [] []
-               ]
 
+fun : Maybe Station -> Int
+fun a =
+  case a of
+    Nothing -> 1
+    Just x -> x.id
+
+funNo2 : Maybe Station -> String
+funNo2 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.no2IndexLevel.indexLevelName
+
+funSo4 : Maybe Station -> String
+funSo4 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.so2IndexLevel.indexLevelName
 
 viewItem : Item -> Html Msg
 viewItem item =

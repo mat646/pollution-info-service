@@ -10,8 +10,8 @@ import           Data.Aeson
 import           Data.Aeson.Types
 
 data Index = Index {
-  id :: Int,
-  indexLevelName :: String
+  id :: Maybe Int,
+  indexLevelName :: Maybe String
 } deriving (Show, Generic)
 
 instance ToJSON Index where

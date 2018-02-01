@@ -13,40 +13,40 @@ import           Index
 data Station = Station {
   id :: Int,
 
-  stCalcDate :: String,
-  stIndexLevel :: Index,
-  stSourceDataDate :: String,
+  stCalcDate :: Maybe String,
+  stIndexLevel :: Maybe Index,
+  stSourceDataDate :: Maybe String,
 
-  so2CalcDate :: String,
-  so2IndexLevel :: Index,
-  so2SourceDataDate :: String,
+  so2CalcDate :: Maybe String,
+  so2IndexLevel :: Maybe Index,
+  so2SourceDataDate :: Maybe String,
 
-  no2CalcDate :: Int,
-  no2IndexLevel :: Index,
-  no2SourceDataDate :: String,
+  no2CalcDate :: Maybe Int,
+  no2IndexLevel :: Maybe Index,
+  no2SourceDataDate :: Maybe String,
 
-  coCalcDate :: String,
-  coIndexLevel :: Index,
-  coSourceDataDate :: String,
+  coCalcDate :: Maybe String,
+  coIndexLevel :: Maybe Index,
+  coSourceDataDate :: Maybe String,
 
-  pm10CalcDate :: String,
-  pm10IndexLevel :: Index,
-  pm10SourceDataDate :: String,
+  pm10CalcDate :: Maybe String,
+  pm10IndexLevel :: Maybe Index,
+  pm10SourceDataDate :: Maybe String,
 
-  pm25CalcDate :: String,
-  pm25IndexLevel :: Index,
-  pm25SourceDataDate :: String,
+  pm25CalcDate :: Maybe String,
+  pm25IndexLevel :: Maybe Index,
+  pm25SourceDataDate :: Maybe String,
 
-  o3CalcDate :: String,
-  o3IndexLevel :: Index,
-  o3SourceDataDate :: String,
+  o3CalcDate :: Maybe String,
+  o3IndexLevel :: Maybe Index,
+  o3SourceDataDate :: Maybe String,
 
-  c6h6CalcDate :: String,
-  c6h6IndexLevel :: Index,
-  c6h6SourceDataDate :: String,
+  c6h6CalcDate :: Maybe String,
+  c6h6IndexLevel :: Maybe Index,
+  c6h6SourceDataDate :: Maybe String,
 
-  stIndexStatus :: Bool,
-  stIndexCrParam :: String
+  stIndexStatus :: Maybe Bool,
+  stIndexCrParam :: Maybe String
 
 } deriving (Show, Generic)
 

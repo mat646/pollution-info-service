@@ -61,49 +61,6 @@ server = do
   db <- mkDB
   return $ apiServer db :<|> assets
 
--- FromJSON data declaration
-
-
--- instance FromJSON Index where
---   parseJSON (Object v) = Index
---     <$> v .: "id"
---     <*> v .: "indexLevelName"
---
--- instance FromJSON Station where
---   parseJSON = withObject "Station" $ \v -> Station
---     <$> v .: "id"
---     <*> v .: "stCalcDate"
---     <*> v .: "stIndexLevel"
---     <*> v .: "stSourceDataDate"
---     <*> v .: "so2CalcDate"
---     <*> v .: "so2IndexLevel"
---     <*> v .: "so2SourceDataDate"
---     <*> v .: "no2CalcDate"
---     <*> v .: "no2IndexLevel"
---     <*> v .: "no2SourceDataDate"
---     <*> v .: "coCalcDate"
---     <*> optional (v .: "coIndexLevel")
---     <*> v .: "coSourceDataDate"
---     <*> v .: "pm10CalcDate"
---     <*> v .: "pm10IndexLevel"
---     <*> v .: "pm10SourceDataDate"
---     <*> v .: "pm25CalcDate"
---     <*> v .: "pm25IndexLevel"
---     <*> v .: "pm25SourceDataDate"
---     <*> v .: "o3CalcDate"
---     <*> v .: "o3IndexLevel"
---     <*> v .: "o3SourceDataDate"
---     <*> v .: "c6h6CalcDate"
---     <*> v .: "c6h6IndexLevel"
---     <*> v .: "c6h6SourceDataDate"
---     <*> v .: "stIndexStatus"
---     <*> v .: "stIndexCrParam"
-
-
-
----------------
-
-
 apiServer :: DB -> Server Api
 apiServer db =
   (liftIO $ (retStation 1)) :<|>
@@ -119,15 +76,13 @@ retStation n = do
   manager <- newManager defaultManagerSettings
   let url n = case n of
         1 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
-        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
+        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/117"
         _ -> "xd"
   request <- parseRequest (url n)
   response <- httpLbs request manager
   let result = responseBody response
   let parsed = decode result :: Maybe Station
   return (fromJust parsed)
-
-
 
 
 listItems :: DB -> Handler [ItemId]
