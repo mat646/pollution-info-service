@@ -4,6 +4,7 @@ import Dict exposing (..)
 import Html exposing (..)
 import Html exposing (program)
 import Html.Events exposing (..)
+import Html.Attributes exposing (class, value, placeholder, classList)
 import Http
 import Api exposing (..)
 
@@ -158,26 +159,64 @@ view state =
         , button [ onClick (FromUi ShowStation2)] [ text "Station 2"]
         , button [ onClick (FromUi ShowStation1)] [ text "Station 3"]
         ]
-            ++ [ table []
+            ++ [ table [ class "datagrid" ]
                     [ thead []
                           [ tr []
-                              [ th [ ] [ text "Symbol" ]
+                              [ th [ ] [ text "Type" ]
                               , th [ ] [ text "Time" ]
-                              , th [ ] [ text "Pollution" ]
+                              , th [ ] [ text "Pollution Index" ]
+                              , th [ ] [ text "Avg (25h)" ]
                               ]
                           ]
                       , tbody []
                           [ tr []
+                              [ td [] [ text "PM10" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funPm10 state.result)) ]
+                              , td [ ] [ text (toString (funPm10 state.result)) ]
+                              ]
+                              ,
+                              tr []
+                              [ td [] [ text "PM25" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funPm25 state.result)) ]
+                              , td [ ] [ text (toString (funPm25 state.result)) ]
+                              ]
+                              ,
+                              tr []
                               [ td [] [ text "NO2" ]
                               , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funNo2 state.result)) ]
                               , td [ ] [ text (toString (funNo2 state.result)) ]
                               ]
                               ,
                               tr []
-                               [ td [] [ text "SO2" ]
-                               , td [ ] [ text (toString (fun state.result)) ]
-                               , td [ ] [ text (toString (funSo4 state.result)) ]
-                               ]
+                              [ td [] [ text "SO2" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funSo2 state.result)) ]
+                              , td [ ] [ text (toString (funSo2 state.result)) ]
+                              ]
+                              ,
+                              tr []
+                              [ td [] [ text "CO" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funCo state.result)) ]
+                              , td [ ] [ text (toString (funCo state.result)) ]
+                              ]
+                              ,
+                              tr []
+                              [ td [] [ text "O3" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funO3 state.result)) ]
+                              , td [ ] [ text (toString (funO3 state.result)) ]
+                              ]
+                              ,
+                              tr []
+                              [ td [] [ text "C6H6" ]
+                              , td [ ] [ text (toString (fun state.result)) ]
+                              , td [ ] [ text (toString (funC6H6 state.result)) ]
+                              , td [ ] [ text (toString (funC6H6 state.result)) ]
+                              ]
                           ]
                       ]
                ]
@@ -194,11 +233,41 @@ funNo2 a =
     Nothing -> "null"
     Just x -> x.no2IndexLevel.indexLevelName
 
-funSo4 : Maybe Station -> String
-funSo4 a =
+funSo2 : Maybe Station -> String
+funSo2 a =
   case a of
     Nothing -> "null"
     Just x -> x.so2IndexLevel.indexLevelName
+
+funCo : Maybe Station -> String
+funCo a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.coIndexLevel.indexLevelName
+
+funPm10 : Maybe Station -> String
+funPm10 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.pm10IndexLevel.indexLevelName
+
+funPm25 : Maybe Station -> String
+funPm25 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.pm25IndexLevel.indexLevelName
+
+funO3 : Maybe Station -> String
+funO3 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.o3IndexLevel.indexLevelName
+
+funC6H6 : Maybe Station -> String
+funC6H6 a =
+  case a of
+    Nothing -> "null"
+    Just x -> x.c6h6IndexLevel.indexLevelName
 
 viewItem : Item -> Html Msg
 viewItem item =
