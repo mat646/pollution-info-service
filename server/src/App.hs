@@ -60,8 +60,8 @@ retStation n = do
   manager <- newManager defaultManagerSettings
   let url n = case n of
         1 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
-        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153" --117
-        _ -> "xd"
+        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
+        _ -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
   request <- parseRequest (url n)
   response <- httpLbs request manager
   let result = responseBody response
@@ -102,7 +102,7 @@ getLastValue s = do
   response <- httpLbs request manager
   let result = responseBody response
   let parsed = decode result :: Maybe Sensor
-  print $ (fromJust parsed)
+  --print $ (fromJust parsed)
   return (values (fromJust parsed))
 
 
@@ -116,7 +116,11 @@ unwrap dob =
     Just x -> x
 
 unwrapIO :: IO Station -> ( Station -> Maybe Index ) -> IO String
-unwrapIO station xd = return . fromJust . Index.indexLevelName =<< return . fromJust . xd =<< station
+unwrapIO station fun = do
+  wrappedStation <- station
+  case (fun wrappedStation) of
+    Nothing -> return "null"
+    Just index -> return  (fromJust (Index.indexLevelName index))
 
 createTable :: IO Station -> [Double] -> IO Table
 createTable station doubl = do
@@ -136,9 +140,10 @@ createTable station doubl = do
   o3Double <- return (doubl !! 5)
   c6h6 <- unwrapIO station Station.c6h6IndexLevel
   c6h6Double <- return (doubl !! 5)
-  return Table { Table.id = ids, Table.time = times, Table.so2IndexLevel = so2,
-    Table.so2Avg = so2Double, Table.no2IndexLevel = no2, Table.no2Avg = no2Double,
-    Table.coIndexLevel = co, Table.coAvg = coDouble, Table.pm10IndexLevel = pm10,
-    Table.pm10Avg = pm10Double, Table.pm25IndexLevel = pm25, Table.pm25Avg = pm25Double,
-    Table.o3IndexLevel = o3, Table.o3Avg = o3Double, Table.c6h6IndexLevel = c6h6,
-    Table.c6h6Avg = c6h6Double}
+  let xd = Table { Table.id = ids, Table.time = times, Table.so2IndexLevel = so2,
+               Table.so2Avg = so2Double, Table.no2IndexLevel = no2, Table.no2Avg = no2Double,
+               Table.coIndexLevel = co, Table.coAvg = coDouble, Table.pm10IndexLevel = pm10,
+               Table.pm10Avg = pm10Double, Table.pm25IndexLevel = pm25, Table.pm25Avg = pm25Double,
+               Table.o3IndexLevel = o3, Table.o3Avg = o3Double, Table.c6h6IndexLevel = c6h6,
+               Table.c6h6Avg = c6h6Double}
+  return xd
