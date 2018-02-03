@@ -69,6 +69,7 @@ apiServer db =
   (liftIO $ (retStation 1)) :<|>
   (liftIO $ (retStation 2)) :<|>
   (liftIO $ (getTable 1)) :<|>
+  (liftIO $ (getTable 2)) :<|>
   listItems db :<|>
   getItem db :<|>
   postItem db :<|>
@@ -128,7 +129,7 @@ retStation n = do
   manager <- newManager defaultManagerSettings
   let url n = case n of
         1 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
-        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/117"
+        2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153" --117
         _ -> "xd"
   request <- parseRequest (url n)
   response <- httpLbs request manager
@@ -141,7 +142,7 @@ getSensorIds :: Int -> IO [String]
 getSensorIds n =
   case n of
     1 -> return ["2783", "2792", "2779", "2788", "2794", "2797"]
-    2 -> return []
+    2 -> return ["2745","2750","16500","2747","2747","2747"]
     3 -> return []
     _ -> return []
 

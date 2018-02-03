@@ -18,6 +18,7 @@ type Api =
     ("tab1" :> Get '[JSON] Station :<|>
      "tab2" :> Get '[JSON] Station :<|>
      "test" :> Get '[JSON] Table :<|>
+     "test2" :> Get '[JSON] Table :<|>
      "item" :> Get '[JSON] [ItemId] :<|>
      "item" :> Capture "itemId" ItemId :> Get '[JSON] Item :<|>
      "item" :> ReqBody '[JSON] String :> Post '[JSON] ItemId :<|>

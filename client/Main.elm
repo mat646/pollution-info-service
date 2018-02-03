@@ -73,6 +73,7 @@ type FromUi
     | ShowStation1
     | ShowStation2
     | GetTable1
+    | GetTable2
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -123,6 +124,13 @@ update message s =
                     in
                         ( s, cmd )
 
+                GetTable2 ->
+                    let
+                        cmd =
+                            Http.send (fromServer NewTable) Api.getApiTable2
+                    in
+                        ( s, cmd )
+
                 AddItemButton ->
                     let
                         new =
@@ -168,8 +176,8 @@ view state =
     div [] <|
         [ text (toString state)
         , div [] []
-        ,  button [ onClick (FromUi ShowStation1)] [ text "Station 1"]
-        , button [ onClick (FromUi ShowStation2)] [ text "Station 2"]
+        ,  button [ onClick (FromUi GetTable1)] [ text "Station 1"]
+        , button [ onClick (FromUi GetTable2)] [ text "Station 2"]
         , button [ onClick (FromUi GetTable1)] [ text "Station 3"]
         ]
             ++ [ table [ class "datagrid" ]
@@ -178,7 +186,7 @@ view state =
                               [ th [ ] [ text "Type" ]
                               , th [ ] [ text "Time" ]
                               , th [ ] [ text "Pollution Index" ]
-                              , th [ ] [ text "Avg (25h)" ]
+                              , th [ ] [ text "Avg (24h)" ]
                               ]
                           ]
                       , tbody []
@@ -236,11 +244,11 @@ view state =
 
 
 
-fun : Maybe Table -> Int
+fun : Maybe Table -> String
 fun a =
   case a of
-    Nothing -> 1
-    Just x -> x.id
+    Nothing -> "null"
+    Just x -> x.time
 
 funNo2 : Maybe Table -> String
 funNo2 a =

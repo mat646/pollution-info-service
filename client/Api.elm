@@ -163,6 +163,29 @@ getApiTable =
             False
         }
 
+getApiTable2 : Http.Request (Table)
+getApiTable2 =
+    Http.request
+        { method =
+            "GET"
+        , headers =
+            []
+        , url =
+            String.join "/"
+                [ ""
+                , "api"
+                , "test2"
+                ]
+        , body =
+            Http.emptyBody
+        , expect =
+            Http.expectJson decodeTable
+        , timeout =
+            Nothing
+        , withCredentials =
+            False
+        }
+
 getApiTab1 : Http.Request (Station)
 getApiTab1 =
     Http.request
