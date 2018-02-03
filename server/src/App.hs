@@ -43,7 +43,8 @@ server = do
 apiServer :: Server Api
 apiServer =
   (liftIO $ (getTable 1)) :<|>
-  (liftIO $ (getTable 2))
+  (liftIO $ (getTable 2)) :<|>
+  (liftIO $ (getTable 3))
 
 
 -- handling sensors
@@ -61,7 +62,7 @@ retStation n = do
   let url n = case n of
         1 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
         2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
-        _ -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/402"
+        _ -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/10120"
   request <- parseRequest (url n)
   response <- httpLbs request manager
   let result = responseBody response
@@ -73,10 +74,9 @@ retStation n = do
 getSensorIds :: Int -> IO [String]
 getSensorIds n =
   case n of
-    1 -> return ["2783", "2792", "2779", "2788", "2794", "2797", "14733"]
+    1 -> return ["14707", "14730", "14734", "14727", "14731", "14729", "14733"]
     2 -> return ["2745","2750","16500","2747","2752","400", "400"]
-    3 -> return []
-    _ -> return []
+    _ -> return ["16465","16457","400","16460","16494","400", "400"]
 
 
 retAvg :: Int -> IO [Double]
@@ -89,9 +89,9 @@ retAvg n = do
   c6h6 <- getAvgFromUrl ((!!) urls 2)
   no2 <- getAvgFromUrl ((!!) urls 3)
   pm25 <- getAvgFromUrl ((!!) urls 4)
-  so2 <- getAvgFromUrl ((!!) urls 5)
-  o3 <- getAvgFromUrl ((!!) urls 6)
-  return [co, pm10, c6h6, no2, pm25, so2, o3]
+  o3 <- getAvgFromUrl ((!!) urls 5)
+  so2 <- getAvgFromUrl ((!!) urls 6)
+  return [co, pm10, c6h6, no2, pm25, o3, so2]
 
 
 getAvgFromUrl :: String -> IO Double
@@ -136,19 +136,19 @@ createTable station doubl = do
   ids <- return . Station.id =<< station
   times <- return . fromJust . Station.stCalcDate =<< station
   so2 <- unwrapIO station Station.so2IndexLevel
-  so2Double <- return (doubl !! 0)
+  so2Double <- return (doubl !! 6)
   no2 <- unwrapIO station Station.no2IndexLevel
-  no2Double <- return (doubl !! 1)
+  no2Double <- return (doubl !! 3)
   co <- unwrapIO station Station.coIndexLevel
-  coDouble <- return (doubl !! 2)
+  coDouble <- return (doubl !! 0)
   pm10 <- unwrapIO station Station.pm10IndexLevel
-  pm10Double <- return (doubl !! 3)
+  pm10Double <- return (doubl !! 1)
   pm25 <- unwrapIO station Station.pm25IndexLevel
   pm25Double <- return (doubl !! 4)
   o3 <- unwrapIO station Station.o3IndexLevel
   o3Double <- return (doubl !! 5)
   c6h6 <- unwrapIO station Station.c6h6IndexLevel
-  c6h6Double <- return (doubl !! 5)
+  c6h6Double <- return (doubl !! 2)
   let xd = Table { Table.id = ids, Table.time = times, Table.so2IndexLevel = so2,
                Table.so2Avg = so2Double, Table.no2IndexLevel = no2, Table.no2Avg = no2Double,
                Table.coIndexLevel = co, Table.coAvg = coDouble, Table.pm10IndexLevel = pm10,

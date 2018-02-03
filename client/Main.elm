@@ -62,6 +62,7 @@ type FromServer
 type FromUi
     = GetTable1
     | GetTable2
+    | GetTable3
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -88,6 +89,13 @@ update message s =
                     in
                         ( s, cmd )
 
+                GetTable3 ->
+                    let
+                        cmd =
+                            Http.send (fromServer NewTable) Api.getApiTable3
+                    in
+                        ( s, cmd )
+
         Error msg ->
             ( { s | error = Just msg }, Cmd.none )
 
@@ -111,7 +119,7 @@ view state =
         , div [] []
         , button [ onClick (FromUi GetTable1)] [ text "Station 1"]
         , button [ onClick (FromUi GetTable2)] [ text "Station 2"]
-        , button [ onClick (FromUi GetTable1)] [ text "Station 3"]
+        , button [ onClick (FromUi GetTable3)] [ text "Station 3"]
         ]
             ++ [ table [ class "datagrid" ]
                     [ thead []

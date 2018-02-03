@@ -93,3 +93,26 @@ getApiTable2 =
         , withCredentials =
             False
         }
+
+getApiTable3 : Http.Request (Table)
+getApiTable3 =
+    Http.request
+        { method =
+            "GET"
+        , headers =
+            []
+        , url =
+            String.join "/"
+                [ ""
+                , "api"
+                , "test3"
+                ]
+        , body =
+            Http.emptyBody
+        , expect =
+            Http.expectJson decodeTable
+        , timeout =
+            Nothing
+        , withCredentials =
+            False
+        }
