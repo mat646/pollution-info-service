@@ -12,7 +12,7 @@ import           Survey
 
 data Sensor = Sensor {
   key :: String,
-  values :: [Survey]
+  values :: Maybe [Survey]
 } deriving (Show, Generic)
 
 instance ToJSON Sensor where

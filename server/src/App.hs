@@ -50,9 +50,9 @@ apiServer =
 
 getTable :: Int -> IO Table
 getTable n = do
-  let station = retStation n
+  station <- retStation n
   sensors <- retAvg n
-  createTable station sensors
+  createTable (return station) sensors
 
 
 retStation :: Int -> IO Station
@@ -61,19 +61,20 @@ retStation n = do
   let url n = case n of
         1 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/9153"
         2 -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
-        _ -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/400"
+        _ -> "http://api.gios.gov.pl/pjp-api/rest/aqindex/getIndex/402"
   request <- parseRequest (url n)
   response <- httpLbs request manager
   let result = responseBody response
   let parsed = decode result :: Maybe Station
+  --print $ parsed
   return (fromJust parsed)
 
 
 getSensorIds :: Int -> IO [String]
 getSensorIds n =
   case n of
-    1 -> return ["2783", "2792", "2779", "2788", "2794", "2797"]
-    2 -> return ["2745","2750","16500","2747","2747","2747"]
+    1 -> return ["2783", "2792", "2779", "2788", "2794", "2797", "14733"]
+    2 -> return ["2745","2750","16500","2747","2752","400", "400"]
     3 -> return []
     _ -> return []
 
@@ -82,18 +83,21 @@ retAvg :: Int -> IO [Double]
 retAvg n = do
   let prefix = "http://api.gios.gov.pl/pjp-api/rest/data/getData/"
   ids <- getSensorIds n
-  let urls = [prefix ++ (ids !! 0),prefix ++ (ids !! 1),prefix ++ (ids !! 2),prefix ++ (ids !! 3),prefix ++ (ids !! 4),prefix ++ (ids !! 5)]
+  let urls = [prefix ++ (ids !! 0),prefix ++ (ids !! 1),prefix ++ (ids !! 2),prefix ++ (ids !! 3),prefix ++ (ids !! 4),prefix ++ (ids !! 5), prefix ++ (ids !! 6)]
   co <- getAvgFromUrl ((!!) urls 0)
   pm10 <- getAvgFromUrl ((!!) urls 1)
   c6h6 <- getAvgFromUrl ((!!) urls 2)
   no2 <- getAvgFromUrl ((!!) urls 3)
   pm25 <- getAvgFromUrl ((!!) urls 4)
   so2 <- getAvgFromUrl ((!!) urls 5)
-  return [co, pm10, c6h6, no2, pm25, so2]
+  o3 <- getAvgFromUrl ((!!) urls 6)
+  return [co, pm10, c6h6, no2, pm25, so2, o3]
 
 
 getAvgFromUrl :: String -> IO Double
-getAvgFromUrl str = return .countAvg =<< (getLastValue str)
+getAvgFromUrl str = do
+  survey <- getLastValue str
+  return (countAvg survey)
 
 getLastValue :: String -> IO [Survey]
 getLastValue s = do
@@ -102,12 +106,17 @@ getLastValue s = do
   response <- httpLbs request manager
   let result = responseBody response
   let parsed = decode result :: Maybe Sensor
-  --print $ (fromJust parsed)
-  return (values (fromJust parsed))
+  case parsed of
+    Nothing -> return []
+    Just sensor -> case (values sensor) of
+      Nothing -> return []
+      Just tab -> return tab
 
 
 countAvg :: [Survey] -> Double
-countAvg tab = (/) (Prelude.foldr (\v n -> (unwrap (value v)) + n) 0 tab) (realToFrac (length tab))
+countAvg tab = case tab of
+  [] -> 0.0
+  _ -> (/) (Prelude.foldr (\v n -> (unwrap (value v)) + n) 0 tab) (realToFrac (length tab))
 
 unwrap :: Maybe Double -> Double
 unwrap dob =

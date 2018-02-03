@@ -37,7 +37,7 @@ init : ( Model, Cmd Msg )
 init =
     let
         fetch =
-            Http.send (fromServer NewTable) Api.getApiTable
+            Cmd.none
 
         state =
             { error = Nothing, table = Nothing }
