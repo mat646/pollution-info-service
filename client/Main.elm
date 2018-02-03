@@ -28,6 +28,7 @@ type alias Model =
     , addItemInput : String
     , error : Maybe String
     , result : Maybe Station
+    , table : Maybe Table
     }
 
 
@@ -42,7 +43,7 @@ init =
             Http.send (fromServer Initial) Api.getApiItem
 
         state =
-            { items = empty, addItemInput = "", error = Nothing, result = Nothing }
+            { items = empty, addItemInput = "", error = Nothing, result = Nothing, table = Nothing }
     in
         ( state, fetch )
 
@@ -62,6 +63,7 @@ type FromServer
     | NewItem Item
     | Delete ItemId
     | NewStation Station
+    | NewTable Table
 
 
 type FromUi
@@ -70,6 +72,7 @@ type FromUi
     | Done ItemId
     | ShowStation1
     | ShowStation2
+    | GetTable1
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,6 +97,9 @@ update message s =
                 NewStation station ->
                     { s | result = Just (station) } ! []
 
+                NewTable table ->
+                    { s | table = Just (table) } ! []
+
         FromUi fromUi ->
             case fromUi of
                 ShowStation1 ->
@@ -107,6 +113,13 @@ update message s =
                     let
                         cmd =
                             Http.send (fromServer NewStation) Api.getApiTab2
+                    in
+                        ( s, cmd )
+
+                GetTable1 ->
+                    let
+                        cmd =
+                            Http.send (fromServer NewTable) Api.getApiTable
                     in
                         ( s, cmd )
 
@@ -157,7 +170,7 @@ view state =
         , div [] []
         ,  button [ onClick (FromUi ShowStation1)] [ text "Station 1"]
         , button [ onClick (FromUi ShowStation2)] [ text "Station 2"]
-        , button [ onClick (FromUi ShowStation1)] [ text "Station 3"]
+        , button [ onClick (FromUi GetTable1)] [ text "Station 3"]
         ]
             ++ [ table [ class "datagrid" ]
                     [ thead []
@@ -171,103 +184,147 @@ view state =
                       , tbody []
                           [ tr []
                               [ td [] [ text "PM10" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funPm10 state.result)) ]
-                              , td [ ] [ text (toString (funPm10 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funPm10 state.table)) ]
+                              , td [ ] [ text (toString (funAvgPm10 state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "PM25" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funPm25 state.result)) ]
-                              , td [ ] [ text (toString (funPm25 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funPm25 state.table)) ]
+                              , td [ ] [ text (toString (funAvgPm25 state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "NO2" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funNo2 state.result)) ]
-                              , td [ ] [ text (toString (funNo2 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funNo2 state.table)) ]
+                              , td [ ] [ text (toString (funAvgNo2 state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "SO2" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funSo2 state.result)) ]
-                              , td [ ] [ text (toString (funSo2 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funSo2 state.table)) ]
+                              , td [ ] [ text (toString (funAvgSo2 state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "CO" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funCo state.result)) ]
-                              , td [ ] [ text (toString (funCo state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funCo state.table)) ]
+                              , td [ ] [ text (toString (funAvgCo state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "O3" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funO3 state.result)) ]
-                              , td [ ] [ text (toString (funO3 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funO3 state.table)) ]
+                              , td [ ] [ text (toString (funAvgO3 state.table)) ]
                               ]
                               ,
                               tr []
                               [ td [] [ text "C6H6" ]
-                              , td [ ] [ text (toString (fun state.result)) ]
-                              , td [ ] [ text (toString (funC6H6 state.result)) ]
-                              , td [ ] [ text (toString (funC6H6 state.result)) ]
+                              , td [ ] [ text (toString (fun state.table)) ]
+                              , td [ ] [ text (toString (funC6H6 state.table)) ]
+                              , td [ ] [ text (toString (funAvgC6H6 state.table)) ]
                               ]
                           ]
                       ]
                ]
 
-fun : Maybe Station -> Int
+
+
+fun : Maybe Table -> Int
 fun a =
   case a of
     Nothing -> 1
     Just x -> x.id
 
-funNo2 : Maybe Station -> String
+funNo2 : Maybe Table -> String
 funNo2 a =
   case a of
     Nothing -> "null"
-    Just x -> x.no2IndexLevel.indexLevelName
+    Just x -> x.no2IndexLevel
 
-funSo2 : Maybe Station -> String
+funAvgNo2 : Maybe Table -> Float
+funAvgNo2 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.no2Avg
+
+funSo2 : Maybe Table -> String
 funSo2 a =
   case a of
     Nothing -> "null"
-    Just x -> x.so2IndexLevel.indexLevelName
+    Just x -> x.so2IndexLevel
 
-funCo : Maybe Station -> String
+funAvgSo2 : Maybe Table -> Float
+funAvgSo2 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.so2Avg
+
+funCo : Maybe Table -> String
 funCo a =
   case a of
     Nothing -> "null"
-    Just x -> x.coIndexLevel.indexLevelName
+    Just x -> x.coIndexLevel
 
-funPm10 : Maybe Station -> String
+funAvgCo : Maybe Table -> Float
+funAvgCo a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.coAvg
+
+funPm10 : Maybe Table -> String
 funPm10 a =
   case a of
     Nothing -> "null"
-    Just x -> x.pm10IndexLevel.indexLevelName
+    Just x -> x.pm10IndexLevel
 
-funPm25 : Maybe Station -> String
+funAvgPm10 : Maybe Table -> Float
+funAvgPm10 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.pm10Avg
+
+funPm25 : Maybe Table -> String
 funPm25 a =
   case a of
     Nothing -> "null"
-    Just x -> x.pm25IndexLevel.indexLevelName
+    Just x -> x.pm25IndexLevel
 
-funO3 : Maybe Station -> String
+funAvgPm25 : Maybe Table -> Float
+funAvgPm25 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.pm25Avg
+
+funO3 : Maybe Table -> String
 funO3 a =
   case a of
     Nothing -> "null"
-    Just x -> x.o3IndexLevel.indexLevelName
+    Just x -> x.o3IndexLevel
 
-funC6H6 : Maybe Station -> String
+funAvgO3 : Maybe Table -> Float
+funAvgO3 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.o3Avg
+
+funC6H6 : Maybe Table -> String
 funC6H6 a =
   case a of
     Nothing -> "null"
-    Just x -> x.c6h6IndexLevel.indexLevelName
+    Just x -> x.c6h6IndexLevel
+
+funAvgC6H6 : Maybe Table -> Float
+funAvgC6H6 a =
+  case a of
+    Nothing -> 0.0
+    Just x -> x.c6h6Avg
 
 viewItem : Item -> Html Msg
 viewItem item =
