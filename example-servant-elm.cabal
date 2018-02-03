@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: efd6b58c3b48571b9a92c951e06783246a16ba6e13c0c466110fbcbd8f514c94
+-- hash: 553a5e976ef22b35e14072c1e413af640444186b67258d92c073702ead5fa410
 
 name:           example-servant-elm
 version:        0.0.0
@@ -29,7 +29,10 @@ executable server
       Api
       App
       Index
+      Sensor
       Station
+      Survey
+      Table
       Paths_example_servant_elm
   default-language: Haskell2010
 
@@ -60,6 +63,9 @@ test-suite spec
       App
       Index
       Main
+      Sensor
       Station
+      Survey
+      Table
       Paths_example_servant_elm
   default-language: Haskell2010

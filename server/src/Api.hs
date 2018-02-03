@@ -11,11 +11,13 @@ import           GHC.Generics
 import           Servant.API
 import           Servant.Elm      (ElmType)
 import           Station
+import           Table
 
 type Api =
   "api" :>
     ("tab1" :> Get '[JSON] Station :<|>
      "tab2" :> Get '[JSON] Station :<|>
+     "test" :> Get '[JSON] Table :<|>
      "item" :> Get '[JSON] [ItemId] :<|>
      "item" :> Capture "itemId" ItemId :> Get '[JSON] Item :<|>
      "item" :> ReqBody '[JSON] String :> Post '[JSON] ItemId :<|>
