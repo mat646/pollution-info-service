@@ -24,10 +24,7 @@ main =
 
 
 type alias Model =
-    { items : Dict Int Item
-    , addItemInput : String
-    , error : Maybe String
-    , result : Maybe Station
+    { error : Maybe String
     , table : Maybe Table
     }
 
@@ -40,10 +37,10 @@ init : ( Model, Cmd Msg )
 init =
     let
         fetch =
-            Http.send (fromServer Initial) Api.getApiItem
+            Http.send (fromServer NewTable) Api.getApiTable
 
         state =
-            { items = empty, addItemInput = "", error = Nothing, result = Nothing, table = Nothing }
+            { error = Nothing, table = Nothing }
     in
         ( state, fetch )
 
@@ -59,20 +56,11 @@ type Msg
 
 
 type FromServer
-    = Initial (List ItemId)
-    | NewItem Item
-    | Delete ItemId
-    | NewStation Station
-    | NewTable Table
+    = NewTable Table
 
 
 type FromUi
-    = AddItemInputChange String
-    | AddItemButton
-    | Done ItemId
-    | ShowStation1
-    | ShowStation2
-    | GetTable1
+    = GetTable1
     | GetTable2
 
 
@@ -81,42 +69,11 @@ update message s =
     case message of
         FromServer fromServerMsg ->
             case fromServerMsg of
-                Initial itemIds ->
-                    ( s
-                    , itemIds
-                        |> List.map getApiItemByItemId
-                        |> List.map (Http.send (fromServer NewItem))
-                        |> Cmd.batch
-                    )
-
-                NewItem item ->
-                    { s | items = insert item.id item s.items } ! []
-
-                Delete id ->
-                    { s | items = remove id s.items } ! []
-
-                NewStation station ->
-                    { s | result = Just (station) } ! []
-
                 NewTable table ->
                     { s | table = Just (table) } ! []
 
         FromUi fromUi ->
             case fromUi of
-                ShowStation1 ->
-                    let
-                        cmd =
-                            Http.send (fromServer NewStation) Api.getApiTab1
-                    in
-                        ( s, cmd )
-
-                ShowStation2 ->
-                    let
-                        cmd =
-                            Http.send (fromServer NewStation) Api.getApiTab2
-                    in
-                        ( s, cmd )
-
                 GetTable1 ->
                     let
                         cmd =
@@ -131,28 +88,6 @@ update message s =
                     in
                         ( s, cmd )
 
-                AddItemButton ->
-                    let
-                        new =
-                            s.addItemInput
-
-                        cmd =
-                            Http.send (fromServer (\id -> NewItem (Item id new))) (postApiItem new)
-
-                        newState =
-                            { s | addItemInput = "" }
-                    in
-                        if new == "" then
-                            update (Error "empty field") s
-                        else
-                            ( newState, cmd )
-
-                AddItemInputChange t ->
-                    { s | addItemInput = t } ! []
-
-                Done id ->
-                    ( s, Http.send (fromServer (\NoContent -> Delete id)) (deleteApiItemByItemId id) )
-
         Error msg ->
             ( { s | error = Just msg }, Cmd.none )
 
@@ -166,8 +101,6 @@ fromServer msgConstructor result =
         Err error ->
             Error <| toString error
 
-
-
 -- VIEW
 
 
@@ -176,7 +109,7 @@ view state =
     div [] <|
         [ text (toString state)
         , div [] []
-        ,  button [ onClick (FromUi GetTable1)] [ text "Station 1"]
+        , button [ onClick (FromUi GetTable1)] [ text "Station 1"]
         , button [ onClick (FromUi GetTable2)] [ text "Station 2"]
         , button [ onClick (FromUi GetTable1)] [ text "Station 3"]
         ]
@@ -333,11 +266,3 @@ funAvgC6H6 a =
   case a of
     Nothing -> 0.0
     Just x -> x.c6h6Avg
-
-viewItem : Item -> Html Msg
-viewItem item =
-    div [] <|
-        [ text item.text
-        , text " - "
-        , button [ onClick (FromUi <| Done item.id) ] [ text "done" ]
-        ]

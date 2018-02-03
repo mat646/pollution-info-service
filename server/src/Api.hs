@@ -11,33 +11,15 @@ import           GHC.Generics
 import           Servant.API
 import           Servant.Elm      (ElmType)
 import           Station
+import           GHC.Generics
+import           Data.Aeson
+import           Data.Aeson.Types
 import           Table
 
 type Api =
   "api" :>
-    ("tab1" :> Get '[JSON] Station :<|>
-     "tab2" :> Get '[JSON] Station :<|>
-     "test" :> Get '[JSON] Table :<|>
-     "test2" :> Get '[JSON] Table :<|>
-     "item" :> Get '[JSON] [ItemId] :<|>
-     "item" :> Capture "itemId" ItemId :> Get '[JSON] Item :<|>
-     "item" :> ReqBody '[JSON] String :> Post '[JSON] ItemId :<|>
-     "item" :> Capture "itemId" ItemId :> Delete '[JSON] NoContent)
+    ("test" :> Get '[JSON] Table :<|>
+     "test2" :> Get '[JSON] Table)
 
 api :: Proxy Api
 api = Proxy
-
--- types
-
-type ItemId = Int
-
-data Item
-  = Item {
-    id :: ItemId,
-    text :: String
-  }
-  deriving (Show, Eq, Generic)
-
-instance ElmType Item
-instance ToJSON Item
-instance FromJSON Item
