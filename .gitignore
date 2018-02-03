@@ -4,3 +4,4 @@ client/tests.js
 .stack-work/
 .idea/
 assets/elm.js
+elm-package.json
