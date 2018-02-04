@@ -59,7 +59,7 @@ getApiTable =
             String.join "/"
                 [ ""
                 , "api"
-                , "test"
+                , "tab1"
                 ]
         , body =
             Http.emptyBody
@@ -82,7 +82,7 @@ getApiTable2 =
             String.join "/"
                 [ ""
                 , "api"
-                , "test2"
+                , "tab2"
                 ]
         , body =
             Http.emptyBody
@@ -105,7 +105,7 @@ getApiTable3 =
             String.join "/"
                 [ ""
                 , "api"
-                , "test3"
+                , "tab3"
                 ]
         , body =
             Http.emptyBody

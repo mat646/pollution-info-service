@@ -18,9 +18,9 @@ import           Table
 
 type Api =
   "api" :>
-    ("test" :> Get '[JSON] Table :<|>
-     "test2" :> Get '[JSON] Table :<|>
-     "test3" :> Get '[JSON] Table)
+    ("tab1" :> Get '[JSON] Table :<|>
+     "tab2" :> Get '[JSON] Table :<|>
+     "tab3" :> Get '[JSON] Table)
 
 api :: Proxy Api
 api = Proxy
