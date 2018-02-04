@@ -12,6 +12,7 @@ dependencies:
   - servant-server
   - transformers
   - containers
+  - time
 
 executables:
   server:

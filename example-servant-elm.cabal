@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 553a5e976ef22b35e14072c1e413af640444186b67258d92c073702ead5fa410
+-- hash: f2a34f5fcae56e0608b71b3bc82519f550c3c1e2ea2363c0e2fc93b79cba6407
 
 name:           example-servant-elm
 version:        0.0.0
@@ -21,6 +21,7 @@ executable server
     , servant
     , servant-elm
     , servant-server
+    , time
     , transformers
     , wai
     , wai-make-assets
@@ -53,6 +54,7 @@ test-suite spec
     , servant-client
     , servant-elm
     , servant-server
+    , time
     , transformers
     , wai
     , wai-make-assets
