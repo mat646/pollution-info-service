@@ -121,7 +121,7 @@ view state =
         , button [ onClick (FromUi GetTable2)] [ text "Station 2"]
         , button [ onClick (FromUi GetTable3)] [ text "Station 3"]
         ]
-            ++ [ table [ class "datagrid" ]
+            ++ [ table [ cls ]
                     [ thead []
                           [ tr []
                               [ th [ ] [ text "Type" ]
@@ -183,7 +183,8 @@ view state =
                       ]
                ]
 
-
+cls =
+  class "datagrid"
 
 fun : Maybe Table -> String
 fun a =
