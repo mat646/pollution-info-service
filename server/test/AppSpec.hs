@@ -14,23 +14,33 @@ import           Api
 import           App (app)
 import           Table
 
-getTab :: ClientM Table
-getTab = client api
+tab1 :: ClientM Table
+tab2 :: ClientM Table
+tab3 :: ClientM Table
+tab1 :<|> tab2 :<|> tab3 = client api
 
 spec :: Spec
 spec = do
   describe "app" $ around withApp $ do
     context "api/tab1" $ do
       it "shows station 1" $ \ host -> do
-        try host getTab `shouldReturn` Table -- not working
+        try host tab1 `shouldReturn` 402
+
+      context "api/tab2" $ do
+        it "shows station 2" $ \ host -> do
+          try host tab2 `shouldReturn` 400
+
+      context "api/tab3" $ do
+        it "shows station 3" $ \ host -> do
+          try host tab3 `shouldReturn` 10120
 
 type Host = (Manager, BaseUrl)
 
-try :: Host -> ClientM a -> IO a
+try :: Host -> ClientM Table -> IO Int
 try (manager, baseUrl) action = do
   result <- runClientM action (ClientEnv manager baseUrl)
   case result of
-    Right x -> return x
+    Right x -> return (Table.id x)
     Left err -> throwIO $ ErrorCall $ show err
 
 withApp :: (Host -> IO a) -> IO a
