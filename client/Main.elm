@@ -4,10 +4,10 @@ import Dict exposing (..)
 import Html exposing (..)
 import Html exposing (program)
 import Html.Events exposing (..)
-import Html.Attributes exposing (class, value, placeholder, classList)
+import Html.Attributes exposing (class, value, placeholder, classList, style)
 import Http
 import Api exposing (..)
-
+import Round exposing (..)
 
 main : Program Never Model Msg
 main =
@@ -113,76 +113,60 @@ fromServer msgConstructor result =
 
 view : Model -> Html Msg
 view state =
-    div [] <|
-        [ text (toString state)
-        , div [] []
-        , button [ onClick (FromUi GetTable1)] [ text "Station 1"]
-        , button [ onClick (FromUi GetTable2)] [ text "Station 2"]
-        , button [ onClick (FromUi GetTable3)] [ text "Station 3"]
+    div [ class "container" ] [
+        div [ class "heading" ] [
+            h1 [] [ text "pollution info service" ]
+            ],
+        div [ class "chooser" ] [
+            h3 [] [ text "Wybierz stację pomiarową:" ],
+            div [ class "buttons" ] [
+                button [ onClick (FromUi GetTable1)] [ text "Station 1"],
+                button [ onClick (FromUi GetTable2)] [ text "Station 2"],
+                button [ onClick (FromUi GetTable3)] [ text "Station 3"]
+                ]
+            ],
+        div [ class "data" ] [
+            table [ class "datagrid" ] [
+                caption [] [ text "Data pomiaru: ", text (fun state.table) ],
+                thead [] [
+                    tr [] [
+                        th [ class "row-Type" ] [ text "Typ zanieczyszczeń" ],
+                        th [ class "row-Index" ] [ text "Stan" ],
+                        th [ class "row-Avg" ] [ text "Średnie wskazanie (ost. 24h)" ]
+                        ]
+                    ],
+                tbody [] [
+                    entry "PM10" (funPm10 state.table) (funAvgPm10 state.table),
+                    entry "PM25" (funPm25 state.table) (funAvgPm25 state.table),
+                    entry "NO2" (funNo2 state.table) (funAvgNo2 state.table),
+                    entry "SO2" (funSo2 state.table) (funAvgSo2 state.table),
+                    entry "CO" (funCo state.table) (funAvgCo state.table),
+                    entry "O3" (funO3 state.table) (funAvgO3 state.table),
+                    entry "C6H6" (funC6H6 state.table) (funAvgC6H6 state.table)
+                    ]
+                ]
+            ]
         ]
-            ++ [ table [ class "datagrid" ]
-                    [ thead []
-                          [ tr []
-                              [ th [ ] [ text "Type" ]
-                              , th [ ] [ text "Time" ]
-                              , th [ ] [ text "Pollution Index" ]
-                              , th [ ] [ text "Avg (24h)" ]
-                              ]
-                          ]
-                      , tbody []
-                          [ tr []
-                              [ td [] [ text "PM10" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funPm10 state.table)) ]
-                              , td [ ] [ text (toString (funAvgPm10 state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "PM25" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funPm25 state.table)) ]
-                              , td [ ] [ text (toString (funAvgPm25 state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "NO2" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funNo2 state.table)) ]
-                              , td [ ] [ text (toString (funAvgNo2 state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "SO2" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funSo2 state.table)) ]
-                              , td [ ] [ text (toString (funAvgSo2 state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "CO" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funCo state.table)) ]
-                              , td [ ] [ text (toString (funAvgCo state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "O3" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funO3 state.table)) ]
-                              , td [ ] [ text (toString (funAvgO3 state.table)) ]
-                              ]
-                              ,
-                              tr []
-                              [ td [] [ text "C6H6" ]
-                              , td [ ] [ text (toString (fun state.table)) ]
-                              , td [ ] [ text (toString (funC6H6 state.table)) ]
-                              , td [ ] [ text (toString (funAvgC6H6 state.table)) ]
-                              ]
-                          ]
-                      ]
-               ]
 
+entry : String -> String -> Float -> Html msg
+entry name index avg =
+  tr []
+  [ td [] [ text name ]
+  , td [ class (mapClass index avg) ] [ text index ]
+  , td [ class (mapClass index avg) ] [ text (Round.round 4 avg) ]
+  ]
 
+mapClass : String -> Float -> String
+mapClass i a =
+  case (i, a) of
+    ("Bardzo dobry", _) -> "bdb"
+    ("Dobry", _) -> "db"
+    ("Umiarkowany", _) -> "um"
+    (_, 0) -> "na"
+    _ -> "ni"
+
+cls =
+  class "datagrid"
 
 fun : Maybe Table -> String
 fun a =
