@@ -3,6 +3,13 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
 
+{-|
+Module      : App
+Description : Application model with fake database.
+
+Module contains methods for requesting @GIOS@ API and
+  mechanisms for retrieving eligible data.
+-}
 module App where
 
 import           Control.Concurrent
@@ -18,7 +25,6 @@ import           Network.Wai.MakeAssets
 import           Data.Maybe (fromJust)
 import           Servant
 import           Network.HTTP.Client (responseBody, newManager, defaultManagerSettings, parseRequest, httpLbs)
-
 import           Api
 import           Index
 import           Station
@@ -33,17 +39,22 @@ type WithAssets = Api :<|> Raw
 withAssets :: Proxy WithAssets
 withAssets = Proxy
 
+
+-- | Returns application instance.
 app :: IO Application
 app =
   serve withAssets <$> server
 
+
+-- | Creates instance of a server.
 server :: IO (Server WithAssets)
 server = do
   assets <- serveAssets
   tabMap <- DB <$> newMVar empty
-
   return $ apiServer tabMap :<|> assets
 
+
+-- | Returns api routing for allowed requests.
 apiServer :: DB -> Server Api
 apiServer tabMap =
   (liftIO $ (process 1 tabMap)) :<|>
@@ -51,12 +62,14 @@ apiServer tabMap =
   (liftIO $ (process 3 tabMap))
 
 
+-- | Scheme of fake database
 data DB = DB (MVar (Map Int Table))
 
 
--- handling tables
-
-process :: Int -> DB -> IO Table
+-- | Main method for retrieving table.
+process :: Int -- ^ Index of table
+  -> DB -- ^ Instance of fake db
+  -> IO Table -- ^ Returns desired table
 process n (DB mvar) = modifyMVar mvar $ \ tabMap -> do
   case (Data.Map.lookup n tabMap) of
     Nothing -> do
@@ -71,6 +84,7 @@ process n (DB mvar) = modifyMVar mvar $ \ tabMap -> do
           return (insert n generateTable tabMap, generateTable)
 
 
+-- | Computes difference between given time (as string) and current time.
 getTimeDiff :: String -> IO Double
 getTimeDiff str = do
   case str of
@@ -82,6 +96,8 @@ getTimeDiff str = do
       let diff = diffUTCTime currentTime timestamp
       return (realToFrac diff)
 
+
+-- | Generates new table if desired table does not exist or has expired.
 generateTable :: Int -> IO Table
 generateTable n = do
   station <- generateStation n
@@ -89,6 +105,7 @@ generateTable n = do
   createTable (return station) sensorsAvg
 
 
+-- | Returns instance of station data from @GIOS@ API.
 generateStation :: Int -> IO Station
 generateStation n = do
   manager <- newManager defaultManagerSettings
@@ -103,6 +120,7 @@ generateStation n = do
   return (fromJust parsed)
 
 
+-- | Computes average pollution value from last 24 surveys for each compound.
 generateAvg :: Int -> IO [Double]
 generateAvg n = do
   let prefix = "http://api.gios.gov.pl/pjp-api/rest/data/getData/"
@@ -117,6 +135,8 @@ generateAvg n = do
   so2 <- getAvgFromUrl (urls !! 6)
   return [co, pm10, c6h6, no2, pm25, o3, so2]
 
+
+-- | Returns indexes of sensors for given station.
 getSensorIds :: Int -> IO [String]
 getSensorIds n =
   case n of
@@ -125,11 +145,14 @@ getSensorIds n =
     _ -> return ["16465","16457","400","16460","16494","400", "400"]
 
 
+-- | Returns average pollution value for given URL.
 getAvgFromUrl :: String -> IO Double
 getAvgFromUrl str = do
   survey <- getValues str
   return (computeAvg survey)
 
+
+-- | Handles requesting @GIOS@ API for given sensor URL.
 getValues :: String -> IO [Survey]
 getValues s = do
   manager <- newManager defaultManagerSettings
@@ -144,31 +167,44 @@ getValues s = do
       Just tab -> return tab
 
 
+-- | Computes average pollution value for given array of values.
 computeAvg :: [Survey] -> Double
 computeAvg tab = case tab of
   [] -> 0.0
   _ -> (/) (Prelude.foldr (\v n -> (unwrapDouble (value v)) + n) 0 tab) (realToFrac (length tab))
 
+
+-- | Unwraps double type.
 unwrapDouble :: Maybe Double -> Double
 unwrapDouble dob =
   case dob of
     Nothing -> 0
     Just x -> x
 
+
+-- | Unwraps time value.
 unwrapTime :: Maybe String -> String
 unwrapTime time =
   case time of
     Nothing -> "null"
     Just x -> x
 
-getLevelName :: IO Station -> ( Station -> Maybe Index ) -> IO String
+
+-- | Retrieves index value name for given field.
+getLevelName :: IO Station -- ^ Wrapped station
+  -> ( Station -> Maybe Index ) -- ^ Retrieving field from data Station
+  -> IO String -- ^ Retrieved index value name
 getLevelName station fun = do
   unwrappedStation <- station
   case (fun unwrappedStation) of
     Nothing -> return "null"
     Just index -> return (fromJust (Index.indexLevelName index))
 
-createTable :: IO Station -> [Double] -> IO Table
+
+-- | Returns new instance of Table data.
+createTable :: IO Station -- ^ Instance of Station data
+  -> [Double] -- ^ Array of average pollution values
+  -> IO Table -- ^ Wrapped Table data instance
 createTable station avgArr = do
   ids <- return . Station.id =<< station
   times <- return . unwrapTime . Station.stCalcDate =<< station

@@ -3,6 +3,12 @@
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
 {-# LANGUAGE TypeOperators #-}
 
+{-|
+Module      : Api
+Description : Module containing server routing types.
+
+Module containing server routing types.
+-}
 module Api where
 
 import           Data.Aeson
@@ -16,6 +22,7 @@ import           Data.Aeson
 import           Data.Aeson.Types
 import           Table
 
+-- | URL routing alternatives.
 type Api =
   "api" :>
     ("tab1" :> Get '[JSON] Table :<|>

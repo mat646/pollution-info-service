@@ -3,6 +3,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
 
+{-|
+Module      : Sensor
+Description : Object which aggregates set of sensors.
+
+Object which aggregates set of sensors.
+-}
 module Station where
 
 import           GHC.Generics
@@ -10,6 +16,7 @@ import           Data.Aeson
 import           Data.Aeson.Types
 import           Index
 
+-- | Data which contains key values for every recorded compound.
 data Station = Station {
   id :: Int,
 

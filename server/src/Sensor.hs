@@ -3,6 +3,12 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE DeriveAnyClass #-}
 
+{-|
+Module      : Sensor
+Description : Object containing set of survey values.
+
+Object containing set of survey values.
+-}
 module Sensor where
 
 import           GHC.Generics
@@ -10,6 +16,7 @@ import           Data.Aeson
 import           Data.Aeson.Types
 import           Survey
 
+-- | Data for sensor with set of measurement arrays
 data Sensor = Sensor {
   key :: String,
   values :: Maybe [Survey]

@@ -5,6 +5,6 @@ Based on [example-servant-elm](https://github.com/haskell-servant/example-servan
 
 ## TODO
 
-- [ ] Delete template
-- [ ] Request caching
-- [ ] Create table in elm
+- [x] Delete template
+- [x] Request caching
+- [x] Create table in elm
