@@ -1,4 +1,9 @@
-name: example-servant-elm
+name: pollution-info-service
+version: 0.1.2
+author:
+- mat646
+- kaskadz
+git: https://github.com/mat646/pollution-info-service.git
 
 dependencies:
   - base

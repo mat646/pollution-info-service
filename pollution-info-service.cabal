@@ -2,12 +2,18 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 20bb15e28bb032918912801875fb28cc1ac5dee32595f2bb0c1e12f9bf5f7608
+-- hash: 6c142fdfd668d72d6a93f53aebf2a1653ccee83cc06c8dea014bc41f97281eef
 
-name:           example-servant-elm
-version:        0.0.0
+name:           pollution-info-service
+version:        0.1.2
+author:         mat646,
+                kaskadz
 build-type:     Simple
 cabal-version:  >= 1.10
+
+source-repository head
+  type: git
+  location: https://github.com/mat646/pollution-info-service.git
 
 executable server
   main-is: Main.hs
@@ -34,7 +40,7 @@ executable server
       Station
       Survey
       Table
-      Paths_example_servant_elm
+      Paths_pollution_info_service
   default-language: Haskell2010
 
 test-suite quickcheck
@@ -70,7 +76,7 @@ test-suite quickcheck
       Station
       Survey
       Table
-      Paths_example_servant_elm
+      Paths_pollution_info_service
   default-language: Haskell2010
 
 test-suite spec
@@ -107,7 +113,7 @@ test-suite spec
       Station
       Survey
       Table
-      Paths_example_servant_elm
+      Paths_pollution_info_service
   default-language: Haskell2010
 
 test-suite unit
@@ -143,5 +149,5 @@ test-suite unit
       Station
       Survey
       Table
-      Paths_example_servant_elm
+      Paths_pollution_info_service
   default-language: Haskell2010
