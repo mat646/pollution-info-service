@@ -12,7 +12,6 @@ install:
 
 script:
   - make setup
-  - make slow-test
   - make build
 
 cache:

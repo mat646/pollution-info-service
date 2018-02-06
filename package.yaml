@@ -21,6 +21,22 @@ executables:
       - server/src
 
 tests:
+  unit:
+    main: AppUnit.hs
+    ghc-options: -main-is AppUnit
+    source-dirs:
+      - server/test
+      - server/src
+    dependencies:
+      - HUnit
+  quickcheck:
+    main: AppQuickCheck.hs
+    ghc-options: -main-is AppQuickCheck
+    source-dirs:
+      - server/test
+      - server/src
+    dependencies:
+      - QuickCheck
   spec:
     main: Spec.hs
     source-dirs:
