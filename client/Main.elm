@@ -4,7 +4,7 @@ import Dict exposing (..)
 import Html exposing (..)
 import Html exposing (program)
 import Html.Events exposing (..)
-import Html.Attributes exposing (class, value, placeholder, classList, style)
+import Html.Attributes exposing (class, value, placeholder, classList, style, id)
 import Http
 import Api exposing (..)
 import Round exposing (..)
@@ -25,6 +25,7 @@ main =
 type alias Model =
     { error : Maybe String
     , table : Maybe Table
+    , stat : Maybe String
     }
 
 
@@ -39,7 +40,7 @@ init =
             Cmd.none
 
         state =
-            { error = Nothing, table = Nothing }
+            { error = Nothing, table = Nothing , stat = Nothing }
     in
         ( state, fetch )
 
@@ -78,22 +79,28 @@ update message s =
                     let
                         cmd =
                             Http.send (fromServer NewTable) Api.getApiTable
+                        ss =
+                            { s | stat = Just (station 1) }
                     in
-                        ( s, cmd )
+                        ( ss, cmd )
 
                 GetTable2 ->
                     let
                         cmd =
                             Http.send (fromServer NewTable) Api.getApiTable2
+                        ss =
+                            { s | stat = Just (station 2) }
                     in
-                        ( s, cmd )
+                        ( ss, cmd )
 
                 GetTable3 ->
                     let
                         cmd =
                             Http.send (fromServer NewTable) Api.getApiTable3
+                        ss =
+                            { s | stat = Just (station 3) }
                     in
-                        ( s, cmd )
+                        ( ss, cmd )
 
         Error msg ->
             ( { s | error = Just msg }, Cmd.none )
@@ -120,14 +127,14 @@ view state =
         div [ class "chooser" ] [
             h3 [] [ text "Wybierz stację pomiarową:" ],
             div [ class "buttons" ] [
-                button [ onClick (FromUi GetTable1)] [ text "Station 1"],
-                button [ onClick (FromUi GetTable2)] [ text "Station 2"],
-                button [ onClick (FromUi GetTable3)] [ text "Station 3"]
+                button [ onClick (FromUi GetTable1)] [ text (station 1)],
+                button [ onClick (FromUi GetTable2)] [ text (station 2)],
+                button [ onClick (FromUi GetTable3)] [ text (station 3)]
                 ]
             ],
         div [ class "data" ] [
             table [ class "datagrid" ] [
-                caption [] [ text "Data pomiaru: ", text (fun state.table) ],
+                caption [] [ text (funStation state.stat) ],
                 thead [] [
                     tr [] [
                         th [ class "row-Type" ] [ text "Typ zanieczyszczeń" ],
@@ -144,9 +151,18 @@ view state =
                     entry "O3" (funO3 state.table) (funAvgO3 state.table),
                     entry "C6H6" (funC6H6 state.table) (funAvgC6H6 state.table)
                     ]
-                ]
+                ],
+            p [ id "date" ] [ text "Data pomiaru: ", text (fun state.table) ]
             ]
         ]
+
+station : Int -> String
+station n =
+  case n of
+    1 -> "Jelenia góra"
+    2 -> "Kraków"
+    3 -> "Tarnów"
+    _ -> "n/a"
 
 entry : String -> String -> Float -> Html msg
 entry name index avg =
@@ -165,8 +181,11 @@ mapClass i a =
     (_, 0) -> "na"
     _ -> "ni"
 
-cls =
-  class "datagrid"
+funStation : Maybe String -> String
+funStation a =
+  case a of
+    Nothing -> "none"
+    Just a -> a
 
 fun : Maybe Table -> String
 fun a =
