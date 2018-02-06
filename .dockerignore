@@ -1,0 +1,8 @@
+Dockerfile
+.dockerignore
+client/elm-stuff/
+.stack-work/
+.idea/
+assets/elm.js
+elm-package.json
+.git/

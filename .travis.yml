@@ -1,6 +1,11 @@
 sudo: false
 
+# Choose a lightweight base image; we provide our own build tools.
+language: c
+
 install:
+  # Using compiler above sets CC to an invalid value, so unset it
+  - unset CC
   # stack
   - mkdir -p ~/.local/bin
   - export PATH=~/.local/bin:$PATH
@@ -16,4 +21,14 @@ script:
 
 cache:
   directories:
+    - $HOME/.ghc
     - $HOME/.stack
+
+
+addons:
+  apt:
+    packages:
+      - libgmp-dev
+    sources:
+      - hvr-ghc
+
