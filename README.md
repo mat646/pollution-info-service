@@ -42,6 +42,15 @@ $ make server-start
 ```
 http://localhost:3000/
 ```
+## Tests
+
+Included tests can be executed with stack
+```bash
+$ make test
+```
+
 ## Documentation
 
-[pollution-info-service-docs](https://mat646.github.io/pollution-info-service-docs/)
+Available at: [**pollution-info-service-docs**](https://mat646.github.io/pollution-info-service-docs/)
+
+Created with [Haddock](https://www.haskell.org/haddock/) build in stack.
