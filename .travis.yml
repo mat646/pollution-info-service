@@ -1,10 +1,8 @@
 sudo: false
 
-# Choose a lightweight base image; we provide our own build tools.
 language: c
 
 install:
-  # Using compiler above sets CC to an invalid value, so unset it
   - unset CC
   # stack
   - mkdir -p ~/.local/bin
