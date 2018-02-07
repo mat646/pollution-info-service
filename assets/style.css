@@ -17,6 +17,11 @@ td.na {
     color: #aa9fc1;
 }
 
+td.dst {
+    background-color: #faec20;
+    color: #000000;
+}
+
 td.ni {
 }
 

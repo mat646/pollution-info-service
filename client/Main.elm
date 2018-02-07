@@ -178,6 +178,7 @@ mapClass i a =
     ("Bardzo dobry", _) -> "bdb"
     ("Dobry", _) -> "db"
     ("Umiarkowany", _) -> "um"
+    ("Dostateczny", _) -> "dst"
     (_, 0) -> "na"
     _ -> "ni"
 
