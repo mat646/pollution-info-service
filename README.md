@@ -2,7 +2,9 @@
 
 Based on [example-servant-elm](https://github.com/haskell-servant/example-servant-elm)
 
-See it in action [**pollution-info-service**](http://128.199.52.30:3000/)
+See it in action [**pollution-info-service**](http://178.62.236.241:3000/)
+
+![Example](https://image.ibb.co/nsxNGH/Screenshot_2018_2_7_Main.png)
 
 ## Usage
 
